@@ -6,7 +6,8 @@ def main():
 
     if not start_time:
         save_start_time()
-        show_prompt('开始做知兔')
+        # show_prompt('开始做知兔')
+        print('开始做知兔')
     else:
         stop_time = datetime.now()
         duration = int((stop_time - start_time).total_seconds())
@@ -22,10 +23,8 @@ def main():
                 duration_minutes=minutes,
             )
         else:
-            show_prompt("结束做知兔 记录无效")
-
-        # today_minutes = count_day_minutes(datetime.now())
-        # log(f"today {today_minutes // 60}:{today_minutes % 60}")
+            # show_prompt("结束做知兔 记录无效")
+            print("结束做知兔 记录无效")
         
         
 if __name__ == '__main__':

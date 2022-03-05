@@ -86,11 +86,12 @@ def get_start_time(delete: bool = True) -> Optional[datetime]:
             obj = yaml.safe_load(fp)
 
         if delete:
-            os.remove('./state.yaml')
+            with open('./state.yaml', 'w'):
+                pass 
+            
+        return obj.get('start_time')
     except Exception:
         return None 
-
-    return obj.get('start_time')
 
 
 def save_start_time(start_time: Optional[datetime] = None):
