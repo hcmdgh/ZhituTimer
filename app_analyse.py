@@ -2,6 +2,9 @@ import schema
 from util import *
 from collections import defaultdict
 import numpy as np
+import texttable
+
+LAST_DAYS = 3
 
 
 def main():
@@ -10,23 +13,38 @@ def main():
     else:
         print("Free.")
     
-    date2records = defaultdict(list)
+    date2records = defaultdict(lambda: defaultdict(int))
 
-    for record in schema.Record.select().order_by(schema.Record.start_time):
+    for record in schema.Record.select():
         date_ = get_date(record.start_time)
-        date2records[date_].append(record.duration_minutes)
+        
+        minutes = record.duration_minutes
+        desc = record.desc 
+        
+        date2records[date_][desc] += minutes
         
     items = list(date2records.items())
     items.sort(key=lambda x: x[0], reverse=True)
+    items = items[:LAST_DAYS]
 
     for date_, records in items:
-        records.sort()
-        total_minutes = int(np.sum(records))
-        # avg_minutes = int(np.mean(records[1:-1]) if len(records) >= 2 else np.mean(records))
+        print(f"日期：{date_}")
+        
+        total_minutes = sum(records.values())
+        records['总计'] = total_minutes
+        
+        table_data = [
+            (desc, f"{minutes // 60}:{minutes % 60}")
+            for desc, minutes in records.items()
+        ]
+        
+        table = texttable.Texttable()
+        table.header(('事项', '时长'))
+        table.add_rows(table_data, header=False) 
 
-        # print(f"[{date_}] 总时长：{total_minutes // 60}:{total_minutes % 60} 平均时长：{avg_minutes // 60}:{avg_minutes % 60}")
-        print(f"[{date_}]\t{total_minutes // 60}:{total_minutes % 60}")
-
+        print(table.draw())
+        
+        print()
 
 if __name__ == '__main__':
     main()
