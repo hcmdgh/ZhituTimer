@@ -5,6 +5,7 @@ sqlite_db = pw.SqliteDatabase(database='./sqlite.db')
 
 class Record(pw.Model):
     id = pw.BigAutoField(primary_key=True)
+    desc = pw.TextField(null=True)
     date = pw.DateTimeField(null=False)
     start_time = pw.DateTimeField(null=False)
     end_time = pw.DateTimeField(null=False)

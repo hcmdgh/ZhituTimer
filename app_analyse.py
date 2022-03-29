@@ -5,7 +5,7 @@ import numpy as np
 
 
 def main():
-    if get_start_time(delete=False):
+    if get_saved_pid() > -1:
         print("Busy......")
     else:
         print("Free.")

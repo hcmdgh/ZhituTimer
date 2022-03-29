@@ -1,11 +1,12 @@
 import schema
 from datetime import datetime, timedelta, date
 from typing import Union, Optional
-# from PyHotKey import manager, Key
 from typing import Callable
 from tkinter import Tk, Label
 import yaml 
 import os 
+from tkinter.simpledialog import askstring 
+from tkinter import Tk 
 
 
 def show_prompt(msg: str, duration: int = 3):
@@ -102,3 +103,29 @@ def save_start_time(start_time: Optional[datetime] = None):
         
     with open('./state.yaml', 'w', encoding='utf-8') as fp:
         obj = yaml.safe_dump(obj, fp)
+
+
+def send_mac_notification(msg: str, title: str = 'Zhitu'):
+    os.system(f''' osascript -e 'display notification "{msg}" with title "{title}"' ''')
+
+
+def get_saved_pid() -> int:
+    try:
+        with open('./state.yaml', 'r', encoding='utf-8') as fp:
+            obj = yaml.safe_load(fp)
+            
+        return obj['pid']
+
+    except Exception:
+        return -1 
+
+
+def inputbox(title: str, prompt: str) -> Optional[str]:
+    app = Tk()
+    app.withdraw()
+
+    content = askstring(title=title, prompt=prompt)
+
+    app.destroy()
+    
+    return content 
