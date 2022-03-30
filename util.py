@@ -1,7 +1,7 @@
 import schema
+import config 
 from datetime import datetime, timedelta, date
 from typing import Union, Optional
-from typing import Callable
 from tkinter import Tk, Label
 import yaml 
 import os 
@@ -10,6 +10,7 @@ from tkinter import Tk
 
 
 def show_prompt(msg: str, duration: int = 3):
+    raise NotImplementedError
     def destroy():
         window.destroy()
 
@@ -32,15 +33,6 @@ def show_prompt(msg: str, duration: int = 3):
     window.mainloop()
 
 
-# def register_hot_key(keys: list[str], func: Callable) -> int:
-#     key_id = manager.RegisterHotKey(trigger=func,
-#                                     keys=list(map(lambda x: getattr(Key, x), keys)),
-#                                     count=1)
-#     assert key_id >= 0
-
-#     return key_id
-
-
 def get_date(datetime_: datetime) -> date:
     return (datetime_ - timedelta(hours=7)).date()
 
@@ -58,11 +50,8 @@ def get_datetime_range(date_: Optional[date] = None) -> tuple[datetime, datetime
     return lower_bound, upper_bound
 
 
-def log(msg: str):
-    print(f'[{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] {msg}')
-
-
 def count_day_minutes(date_: Union[None, datetime, date]) -> int:
+    raise NotImplementedError
     if date_ is None:
         date_ = datetime.now()
 
@@ -82,6 +71,7 @@ def count_day_minutes(date_: Union[None, datetime, date]) -> int:
 
 
 def get_start_time(delete: bool = True) -> Optional[datetime]:
+    raise NotImplementedError
     try:
         with open('./state.yaml', 'r', encoding='utf-8') as fp:
             obj = yaml.safe_load(fp)
@@ -96,6 +86,7 @@ def get_start_time(delete: bool = True) -> Optional[datetime]:
 
 
 def save_start_time(start_time: Optional[datetime] = None):
+    raise NotImplementedError
     if not start_time:
         start_time = datetime.now() 
         
@@ -108,23 +99,27 @@ def save_start_time(start_time: Optional[datetime] = None):
 def send_mac_notification(msg: str, title: str = 'Zhitu'):
     os.system(f''' osascript -e 'display notification "{msg}" with title "{title}"' ''')
 
-
-def get_saved_pid() -> int:
-    try:
-        with open('./state.yaml', 'r', encoding='utf-8') as fp:
-            obj = yaml.safe_load(fp)
-            
-        return obj['pid']
-
-    except Exception:
-        return -1 
+    
+def save_pid():
+    pid = os.getpid()
+        
+    config.set_config('pid', pid)
 
 
-def inputbox(title: str, prompt: str) -> Optional[str]:
+def get_saved_pid(delete_after: bool) -> Optional[int]:
+    pid = config.get_config('pid')
+    
+    if delete_after:
+        config.set_config('pid', None)
+        
+    return pid  
+
+
+def inputbox(title: str, prompt: str, init_content: Optional[str]) -> Optional[str]:
     app = Tk()
     app.withdraw()
 
-    content = askstring(title=title, prompt=prompt)
+    content = askstring(title=title, prompt=prompt, initialvalue=init_content)
 
     app.destroy()
     

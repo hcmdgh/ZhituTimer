@@ -1,4 +1,3 @@
-import schema
 from util import *
 from collections import defaultdict
 import numpy as np
@@ -8,7 +7,7 @@ LAST_DAYS = 3
 
 
 def main():
-    if get_saved_pid() > -1:
+    if get_saved_pid(delete_after=False):
         print("Busy......")
     else:
         print("Free.")
