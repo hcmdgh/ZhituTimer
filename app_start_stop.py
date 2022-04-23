@@ -4,7 +4,7 @@ from typing import Optional, Any
 import time 
 import yaml 
 
-NOTIFICATION_DURATION = 10
+NOTIFICATION_DURATION = 15
 
 task_name = None 
 
@@ -42,8 +42,8 @@ def main():
 
     global task_name    
         
-    # task_name = inputbox(title='你好，知兔', prompt='请输入任务名称：', init_content=last_task_name)
-    task_name = '学习'
+    task_name = inputbox(title='你好，知兔', prompt='请输入任务名称：', init_content=last_task_name)
+    # task_name = '学习'
 
     if not task_name:
         exit(0)
