@@ -1,12 +1,15 @@
 import schema
 import config 
 from datetime import datetime, timedelta, date
-from typing import Union, Optional
+from typing import Union, Optional, Any 
 from tkinter import Tk, Label
+import pymongo
 import yaml 
 import os 
 from tkinter.simpledialog import askstring 
 from tkinter import Tk 
+import texttable
+import prettytable
 
 
 def show_prompt(msg: str, duration: int = 3):
@@ -33,14 +36,18 @@ def show_prompt(msg: str, duration: int = 3):
     window.mainloop()
 
 
-def get_date(datetime_: datetime) -> date:
-    return (datetime_ - timedelta(hours=7)).date()
+def get_real_date(_datetime: Optional[datetime] = None) -> date:
+    if not _datetime:
+        _datetime = datetime.now()
+    
+    return (_datetime - timedelta(hours=7)).date()
 
 
 def get_datetime_range(date_: Optional[date] = None) -> tuple[datetime, datetime]:
+    raise DeprecationWarning
     if not date_:
         now = datetime.now()
-        date_ = get_date(now)
+        date_ = get_real_date(now)
 
     date_ = datetime.combine(date_, datetime.min.time())
 
@@ -56,7 +63,7 @@ def count_day_minutes(date_: Union[None, datetime, date]) -> int:
         date_ = datetime.now()
 
     if type(date_) == datetime:
-        lower_bound, upper_bound = get_datetime_range(get_date(date_))
+        lower_bound, upper_bound = get_datetime_range(get_real_date(date_))
     elif type(date_) == date:
         lower_bound, upper_bound = get_datetime_range(date_)
     else:
@@ -124,3 +131,82 @@ def inputbox(title: str, prompt: str, init_content: Optional[str]) -> Optional[s
     app.destroy()
     
     return content 
+
+
+def draw_table(entries: list[dict[str, Any]]):
+    assert entries 
+    
+    column_names = list(entries[0].keys())
+    
+    # table = texttable.Texttable()
+    # table.header(column_names)
+    
+    table = prettytable.PrettyTable(column_names)
+    
+    for entry in entries:
+        row = []
+        
+        for column_name in column_names:
+            row.append(entry.get(column_name))
+        
+        table.add_row(row)
+        
+    print(table)
+    
+    
+def format_minutes(minutes: int) -> str:
+    if minutes < 5:
+        return '-'
+    
+    h = minutes // 60 
+    m = minutes % 60 
+    
+    return f"{h}:{m:0>2d}"
+
+
+def calc_time_delta(start_time: Union[datetime, str],
+                    end_time: Union[datetime, str]) -> int:
+    """
+    计算两个时间的时间差，以分钟数返回。
+    """
+    
+    if isinstance(start_time, str):
+        start_time = str2datetime(start_time)
+
+    if isinstance(end_time, str):
+        end_time = str2datetime(end_time)
+    
+    return int((end_time - start_time).total_seconds()) // 60
+
+
+def date2str(_date: date) -> str:
+    return _date.strftime('%Y-%m-%d')
+
+
+def str2datetime(s: str) -> datetime:
+    return datetime.strptime(s, '%Y-%m-%d %H:%M:%S')
+
+
+def str2datetime_(s: str) -> datetime:
+    return datetime.strptime(s, '%Y-%m-%d %H:%M:%S.%f')
+
+    
+def datetime2str(_datetime: datetime) -> str:
+    return _datetime.strftime('%Y-%m-%d %H:%M:%S')
+
+
+def datetime2mstr(_datetime: Union[datetime, str, None]) -> str:
+    if not _datetime:
+        return '-'
+    
+    if isinstance(_datetime, str):
+        _datetime = str2datetime(_datetime)
+        
+    return _datetime.strftime('%H:%M')
+        
+
+if __name__ == '__main__':
+    draw_table([
+        {'name': '耿皓', 'sex': True, 'birth': datetime.now().date()},
+        {'name': '啊哈哈', 'sex': False, 'birth': datetime.now()},
+    ])

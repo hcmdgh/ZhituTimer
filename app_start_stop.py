@@ -4,7 +4,7 @@ from typing import Optional, Any
 import time 
 import yaml 
 
-NOTIFICATION_DURATION = 15
+NOTIFICATION_DURATION = 10
 
 task_name = None 
 
