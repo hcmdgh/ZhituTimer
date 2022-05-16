@@ -23,9 +23,9 @@ def signal_handler(signalnum, frame):
     send_mac_notification(f"The journey comes to an end! {minutes // 60}:{minutes % 60}")
 
     collection.insert_one({
-        'date': get_real_date(start_time),
+        'date': date2str(get_real_date(start_time)),
         'task_name': task_name,
-        'start_time': start_time,
+        'start_time': datetime2str(start_time),
         'duration_minutes': minutes,
     })
         
