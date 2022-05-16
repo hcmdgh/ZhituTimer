@@ -6,7 +6,13 @@ import yaml
 
 NOTIFICATION_DURATION = 10
 
+TASK_NAMES = config.get_config('valid_task_names')
+
 task_name = None 
+
+client = pymongo.MongoClient()
+db = client.zhitu_timer 
+collection = db.record 
 
 
 def signal_handler(signalnum, frame):
@@ -14,18 +20,14 @@ def signal_handler(signalnum, frame):
     duration = int((stop_time - start_time).total_seconds())
     minutes = duration // 60
 
-    if minutes >= 5 or True:
-        send_mac_notification(f"The journey comes to an end! {minutes // 60}:{minutes % 60}")
+    send_mac_notification(f"The journey comes to an end! {minutes // 60}:{minutes % 60}")
 
-        schema.Record.create(
-            date=start_time,
-            start_time=start_time,
-            end_time=stop_time,
-            duration_minutes=minutes,
-            desc=task_name,
-        )
-    else:
-        send_mac_notification("The journey comes to an end, but takes too short!")
+    collection.insert_one({
+        'date': get_real_date(start_time),
+        'task_name': task_name,
+        'start_time': start_time,
+        'duration_minutes': minutes,
+    })
         
     get_saved_pid(delete_after=True)
     
@@ -42,13 +44,17 @@ def main():
 
     global task_name    
         
-    task_name = inputbox(title='你好，知兔', prompt='请输入任务名称：', init_content=last_task_name)
-    # task_name = '学习'
+    while True:
+        task_name = inputbox(title='Hello, Zhituer!', prompt='Task name:', init_content=last_task_name)
 
-    if not task_name:
-        exit(0)
-    else:
-        config.set_config('last_task_name', task_name)
+        if not task_name:
+            exit(0)
+        elif task_name not in TASK_NAMES:
+            pass 
+        else:
+            break 
+
+    config.set_config('last_task_name', task_name)
     
     save_pid()
     

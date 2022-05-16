@@ -4,7 +4,7 @@ from collections import defaultdict
 
 LAST_DAYS = 999
 
-TASK_NAMES = get_config('invalid_task_names')
+TASK_NAMES = get_config('valid_task_names')
 
 
 def main():
@@ -50,29 +50,30 @@ def main():
             punch_start_time = punch_end_time = punch_duration = None 
         
         entry = {
-            '日期': _date,
-            '早打卡': datetime2mstr(punch_start_time),
-            '晚打卡': datetime2mstr(punch_end_time),
+            'Date': _date,
+            'Punch In': datetime2mstr(punch_start_time),
+            'Punch Out': datetime2mstr(punch_end_time),
         }
         
         other_duration = 0 
         
         for task_name in TASK_NAMES:
             duration = records.get(task_name, 0)
-            entry[task_name] = format_minutes(duration)
+            titled_task_name = task_name.title()
+            entry[titled_task_name] = format_minutes(duration)
             other_duration += duration
             
         if punch_duration:
             entry.update({
-                '总时长': format_minutes(punch_duration),
-                '在线时长': format_minutes(punch_duration - other_duration),
-                '离线时长': format_minutes(other_duration),
+                'Total': format_minutes(punch_duration),
+                'Online': format_minutes(punch_duration - other_duration),
+                'Offline': format_minutes(other_duration),
             })
         else:
             entry.update({
-                '总时长': '-',
-                '在线时长': '-',
-                '离线时长': format_minutes(other_duration),
+                'Total': '-',
+                'Online': '-',
+                'Offline': format_minutes(other_duration),
             })
         
         entries.append(entry)

@@ -45,10 +45,10 @@ def main():
         end_time = record['end_time']
         
         entry = {
-            '日期': record['_id'],
-            '上班打卡': datetime2mstr(start_time),
-            '下班打卡': datetime2mstr(end_time),
-            '时长': format_minutes(calc_time_delta(start_time, end_time)) if start_time and end_time else '-',
+            'Date': record['_id'],
+            'Punch In': datetime2mstr(start_time),
+            'Punch Out': datetime2mstr(end_time),
+            'Duration': format_minutes(calc_time_delta(start_time, end_time)) if start_time and end_time else '-',
         }
         
         entries.append(entry)
