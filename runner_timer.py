@@ -3,6 +3,8 @@ import signal
 from typing import Optional, Any 
 import time 
 import yaml 
+import argparse 
+import sys 
 
 NOTIFICATION_DURATION = 10
 
@@ -35,22 +37,26 @@ def signal_handler(signalnum, frame):
         
         
 def main():
+    parser = argparse.ArgumentParser() 
+    
+    parser.add_argument('--task_name', type=str, required=True)
+    
+    args = parser.parse_args() 
+    
+    global task_name 
+    task_name = args.task_name
+    assert task_name
+        
     saved_pid = get_saved_pid(delete_after=True)
     if saved_pid:
         os.kill(saved_pid, signal.SIGTERM)
         exit(0)
 
-    last_task_name = config.get_config('last_task_name')
-
-    global task_name    
-        
     while True:
-        task_name = inputbox(title='Hello, Zhituer!', prompt='Task name:', init_content=last_task_name)
-
         if not task_name:
-            exit(0)
+            exit()
         elif task_name not in TASK_NAMES:
-            pass 
+            task_name = inputbox(title='Hello, Zhituer!', prompt='Task name:', init_content=task_name)
         else:
             break 
 
